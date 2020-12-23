@@ -1,6 +1,7 @@
 #!/bin/bash +x
 REPOSITORY=product-is
-PRODUCT_REPOSITORY_FORKED=janama360/${REPOSITORY}
+GIT_USERNAME=janama360
+PRODUCT_REPOSITORY_FORKED=${GIT_USERNAME}/${REPOSITORY}
 
 PRODUCT_REPOSITORY_PUBLIC=wso2/${REPOSITORY}
 REMOTE_PRODUCT_REPOSITORY_PUBLIC=wso2-is-public
@@ -49,7 +50,7 @@ org.wso2.carbon.consent.*,\
 org.wso2.carbon.utils,\
 org.wso2.charon,\
 org.apache.rampart.wso2,\
-org.apache.ws.security.wso2
+org.apache.ws.security.wso2 --batch-mode
 
 echo ""
 echo 'Check if new updates are available'
@@ -79,12 +80,12 @@ mvn clean install -Dmaven.test.skip=true --batch-mode | tee mvn-build.log
 
 REPOSITORY=product-is
 REMOTE_PRODUCT_REPOSITORY_PUBLIC=wso2-is-public
-PRODUCT_REPOSITORY_FORKED=janama360/${REPOSITORY}
+PRODUCT_REPOSITORY_FORKED=${GIT_USERNAME}/${REPOSITORY}
 PRODUCT_REPOSITORY_PUBLIC=wso2/${REPOSITORY}
 BUILD_STATUS = SUCCESS
 UPDATES_STATUS = 'There are no new updates'
 
-cd ${REPOSITORY}
+
 if [ -s dependency_updates.diff ]
 then
   UPDATES_STATUS = 'There are new updates available'
@@ -115,7 +116,7 @@ then
   TITLE="Bump Dependencies #"$BUILD_NUMBER
   STATUS=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -k -X \
   POST https://api.github.com/repos/${PRODUCT_REPOSITORY_PUBLIC}/pulls \
-  -H "Authorization: Bearer "${GIT_TOKEN}"" \
+  -H "Authorization: token "${GIT_TOKEN}"" \
   -H "Content-Type: application/json" \
   -d '{ "title": "'"${TITLE}"'","body": "Bumps dependencies for product-is.","head": "'"${GIT_USERNAME}:${DEPENDENCY_UPGRADE_BRANCH_NAME}"'","base":"master"}')
   
